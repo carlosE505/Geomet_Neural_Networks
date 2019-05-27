@@ -1,0 +1,65 @@
+If the code is working properly, the results that needs to be achieved for the test data given are:
+
+Relative Error Results
+Training Set
+Zn Conc. Mass Recovery -0.12884519401642727
+Pb Conc. Mass Recovery -13.384756689311512
+Tailings Mass Recovery 0.01738958866360413
+Zn Met. Recovery in Zn Conc -0.0005489467025683077
+Zn Met. Recovery in Pb Conc -57.14191863928192
+Zn Met. Recovery in Tailings -0.25385018274463406
+Test Set
+Zn Conc. Mass Recovery -9.843117184661986
+Pb Conc. Mass Recovery -15.359840951791563
+Tailings Mass Recovery 5.118726138589596
+Zn Met. Recovery in Zn Conc -7.460400912037296
+Zn Met. Recovery in Pb Conc -75.54532205808194
+Zn Met. Recovery in Tailings44.2107573928242
+
+Pearson Correlation Results
+Training Set
+Zn Conc. Mass Recovery [0.9997106534929507]
+Pb Conc. Mass Recovery [0.949211393645451]
+Tailings Mass Recovery [0.9998395563063512]
+Zn Met. Recovery in Zn Conc [0.9997192948455584]
+Zn Met. Recovery in Pb Conc [-0.09107284401837089]
+Zn Met. Recovery in Tailings [0.999667816007145]
+Test Set
+Zn Conc. Mass Recovery [0.8485495589480174]
+Pb Conc. Mass Recovery [0.981369661230642]
+Tailings Mass Recovery [0.8504280775166281]
+Zn Met. Recovery in Zn Conc [0.7296632432283838]
+Zn Met. Recovery in Pb Conc [0.5369968074487398]
+Zn Met. Recovery in Tailings [0.7178731009481317]
+
+MAE Results
+Training Set
+Zn Conc. Mass Recovery [0.003078347022192812]
+Pb Conc. Mass Recovery [0.0006760180948036057]
+Tailings Mass Recovery [0.0022039618287767538]
+Zn Met. Recovery in Zn Conc [0.0028865898472922474]
+Zn Met. Recovery in Pb Conc [0.003368773999171598]
+Zn Met. Recovery in Tailings [0.0027214039666312068]
+Test Set
+Zn Conc. Mass Recovery [0.05215475873152415]
+Pb Conc. Mass Recovery [0.0016043537062903244]
+Tailings Mass Recovery [0.05263312269846595]
+Zn Met. Recovery in Zn Conc [0.06881109835306805]
+Zn Met. Recovery in Pb Conc [0.008160922568043074]
+Zn Met. Recovery in Tailings [0.07307959006627401]
+
+MSE Results
+Training Set
+Zn Conc. Mass Recovery [1.4282569418921567e-05]
+Pb Conc. Mass Recovery [8.773955394636374e-07]
+Tailings Mass Recovery [8.017161261308741e-06]
+Zn Met. Recovery in Zn Conc [1.1090507844094503e-05]
+Zn Met. Recovery in Pb Conc [2.067618105167014e-05]
+Zn Met. Recovery in Tailings [1.3366631638080837e-05]
+Test Set
+Zn Conc. Mass Recovery [0.003929188723126306]
+Pb Conc. Mass Recovery [3.6905319463775943e-06]
+Tailings Mass Recovery [0.0036290998456503525]
+Zn Met. Recovery in Zn Conc [0.006855409012125807]
+Zn Met. Recovery in Pb Conc [8.055103911336657e-05]
+Zn Met. Recovery in Tailings [0.00765809264082199]

@@ -1,0 +1,260 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Mar 16 17:08:09 2019
+
+@author: Fernanda Gontijo - fernanda.gontijo.fn@gmail.com
+"""
+
+### LIBRARIES ###
+
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+import keras
+from keras.models import Sequential
+from keras.layers import Dense
+import os
+from sklearn.model_selection import cross_val_score
+from sklearn.preprocessing import StandardScaler
+import sklearn.preprocessing as preprocessing
+import sklearn.metrics as metrics
+from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_absolute_error
+import scipy
+from scipy.stats.stats import pearsonr
+from keras import metrics
+from keras import optimizers
+from sklearn.cross_validation import train_test_split
+
+### IMPORT DATABASE ###
+
+data_path = r'C:\Users\Fernanda\Desktop\Computers and Geosciences'
+training_file = os.path.join(data_path, 'testdata_kfold1.csv')
+df_training = pd.read_csv(training_file, sep=";")
+test_file = os.path.join(data_path, 'testdata_kfold1t.csv')
+df_test = pd.read_csv(test_file, sep=";")
+
+var_indep = ['Zn', 'Mg', 'Co', 'Cd', 'Fe', 'V', 'Pb', 'Al', 'Li', 'Ag', 'Mn', 'Ni']
+var_dep = ['Zn Met Rec in Zn Conc','Zn Met Rec in Pb Conc', 'Zn Met Rec in Tailings', 'Zn Mass Rec','Pb Mass Rec', 'Tailings Mass Rec']
+
+X_training = df_training[var_indep]
+Y_training_f = df_training[var_dep]
+X_test = df_test[var_indep]
+Y_test_f = df_test[var_dep]
+
+### PREPROCESSING ### 
+### STANDARD SCALER ###
+
+scaler = preprocessing.StandardScaler().fit(X_training)
+X_training_scaled = scaler.transform(X_training)
+X_training_std = pd.DataFrame(X_training_scaled,columns=var_indep)
+X_test_scaled = scaler.transform(X_test)
+X_test_std = pd.DataFrame(X_test_scaled,columns=var_indep)
+
+### NEURAL NETWORK ###
+    
+mae_rm_conc_zn = []
+mae_training_rm_conc_zn = []
+mse_rm_conc_zn = []
+mse_training_rm_conc_zn = []
+pearson_rm_conc_zn = []
+pearson_training_rm_conc_zn = []
+mae_rm_conc_pb = []
+mae_training_rm_conc_pb = []
+mse_rm_conc_pb = []
+mse_training_rm_conc_pb = []
+pearson_rm_conc_pb = []
+pearson_training_rm_conc_pb = []
+mae_rm_tailings = []
+mae_training_rm_tailings = []
+mse_rm_tailings = []
+mse_training_rm_tailings = []
+pearson_rm_tailings = []
+pearson_training_rm_tailings = []
+mae_conc_zn = []
+mae_training_conc_zn = []
+mse_conc_zn = []
+mse_training_conc_zn = []
+mae_conc_pb = []
+mae_training_conc_pb = []
+mse_conc_pb = []
+mse_training_conc_pb = []
+mae_tailings = []
+mae_training_tailings = []
+mse_tailings = []
+mse_training_tailings = []
+pearson_conc_zn = []
+pearson_training_conc_zn = []
+pearson_conc_pb = []
+pearson_training_conc_pb = []
+pearson_tailings = []
+pearson_training_tailings = []
+
+epochs = [5000]
+    
+for n_epoch in epochs:
+    np.random.seed(8520)
+    sgd = optimizers.SGD(lr=0.008, momentum=0.0, decay=0.0, nesterov=False)
+    ann = Sequential()
+    ann.add(Dense(output_dim = 10, init = 'uniform', activation = 'tanh', input_dim = 12))
+    ann.add(Dense(output_dim = 6, init = 'uniform', activation = 'relu'))
+    ann.compile(optimizer = sgd, loss = 'mean_squared_error', metrics = ['mae'])
+    ann.fit(X_training_std, Y_training_f, batch_size = 1, nb_epoch = n_epoch)
+    y_pred_training = ann.predict(X_training_std)
+    y_pred_test = ann.predict(X_test_std)
+    Y_test_pred = pd.DataFrame(y_pred_test, columns=var_dep)
+    Y_training_pred = pd.DataFrame(y_pred_training, columns=var_dep)
+    mae_rm_conc_zn.append(mean_absolute_error(Y_test_f['Zn Met Rec in Zn Conc'], Y_test_pred['Zn Met Rec in Zn Conc']))
+    mae_training_rm_conc_zn.append(mean_absolute_error(Y_training_f['Zn Met Rec in Zn Conc'], Y_training_pred['Zn Met Rec in Zn Conc']))
+    mse_rm_conc_zn.append(mean_squared_error(Y_test_f['Zn Met Rec in Zn Conc'], Y_test_pred['Zn Met Rec in Zn Conc']))
+    mse_training_rm_conc_zn.append(mean_squared_error(Y_training_f['Zn Met Rec in Zn Conc'], Y_training_pred['Zn Met Rec in Zn Conc']))
+    pearson_rm_conc_zn.append(pearsonr(Y_test_f['Zn Met Rec in Zn Conc'], Y_test_pred['Zn Met Rec in Zn Conc']))
+    pearson_training_rm_conc_zn.append(pearsonr(Y_training_f['Zn Met Rec in Zn Conc'], Y_training_pred['Zn Met Rec in Zn Conc']))
+    mae_rm_conc_pb.append(mean_absolute_error(Y_test_f['Zn Met Rec in Pb Conc'], Y_test_pred['Zn Met Rec in Pb Conc']))
+    mae_training_rm_conc_pb.append(mean_absolute_error(Y_training_f['Zn Met Rec in Pb Conc'], Y_training_pred['Zn Met Rec in Pb Conc']))
+    mse_rm_conc_pb.append(mean_squared_error(Y_test_f['Zn Met Rec in Pb Conc'], Y_test_pred['Zn Met Rec in Pb Conc']))
+    mse_training_rm_conc_pb.append(mean_squared_error(Y_training_f['Zn Met Rec in Pb Conc'], Y_training_pred['Zn Met Rec in Pb Conc']))
+    pearson_rm_conc_pb.append(pearsonr(Y_test_f['Zn Met Rec in Pb Conc'], Y_test_pred['Zn Met Rec in Pb Conc']))
+    pearson_training_rm_conc_pb.append(pearsonr(Y_training_f['Zn Met Rec in Pb Conc'], Y_training_pred['Zn Met Rec in Pb Conc']))
+    mae_rm_tailings.append(mean_absolute_error(Y_test_f['Zn Met Rec in Tailings'], Y_test_pred['Zn Met Rec in Tailings']))
+    mae_training_rm_tailings.append(mean_absolute_error(Y_training_f['Zn Met Rec in Tailings'], Y_training_pred['Zn Met Rec in Tailings'])) 
+    mse_rm_tailings.append(mean_squared_error(Y_test_f['Zn Met Rec in Tailings'], Y_test_pred['Zn Met Rec in Tailings']))
+    mse_training_rm_tailings.append(mean_squared_error(Y_training_f['Zn Met Rec in Tailings'], Y_training_pred['Zn Met Rec in Tailings']))
+    pearson_rm_tailings.append(pearsonr(Y_test_f['Zn Met Rec in Tailings'], Y_test_pred['Zn Met Rec in Tailings']))
+    pearson_training_rm_tailings.append(pearsonr(Y_training_f['Zn Met Rec in Tailings'], Y_training_pred['Zn Met Rec in Tailings']))
+    mae_conc_zn.append(mean_absolute_error(Y_test_f['Zn Mass Rec'], Y_test_pred['Zn Mass Rec']))
+    mae_training_conc_zn.append(mean_absolute_error(Y_training_f['Zn Mass Rec'], Y_training_pred['Zn Mass Rec']))
+    mae_conc_pb.append(mean_absolute_error(Y_test_f['Pb Mass Rec'], Y_test_pred['Pb Mass Rec']))
+    mae_training_conc_pb.append(mean_absolute_error(Y_training_f['Pb Mass Rec'], Y_training_pred['Pb Mass Rec']))
+    mae_tailings.append(mean_absolute_error(Y_test_f['Tailings Mass Rec'], Y_test_pred['Tailings Mass Rec']))
+    mae_training_tailings.append(mean_absolute_error(Y_training_f['Tailings Mass Rec'], Y_training_pred['Tailings Mass Rec'])) 
+    mse_conc_zn.append(mean_squared_error(Y_test_f['Zn Mass Rec'], Y_test_pred['Zn Mass Rec']))
+    mse_training_conc_zn.append(mean_squared_error(Y_training_f['Zn Mass Rec'], Y_training_pred['Zn Mass Rec']))
+    mse_conc_pb.append(mean_squared_error(Y_test_f['Pb Mass Rec'], Y_test_pred['Pb Mass Rec']))
+    mse_training_conc_pb.append(mean_squared_error(Y_training_f['Pb Mass Rec'], Y_training_pred['Pb Mass Rec']))
+    mse_tailings.append(mean_squared_error(Y_test_f['Tailings Mass Rec'], Y_test_pred['Tailings Mass Rec']))
+    mse_training_tailings.append(mean_squared_error(Y_training_f['Tailings Mass Rec'], Y_training_pred['Tailings Mass Rec']))
+    pearson_conc_zn.append(pearsonr(Y_test_f['Zn Mass Rec'], Y_test_pred['Zn Mass Rec']))
+    pearson_training_conc_zn.append(pearsonr(Y_training_f['Zn Mass Rec'], Y_training_pred['Zn Mass Rec']))
+    pearson_conc_pb.append(pearsonr(Y_test_f['Pb Mass Rec'], Y_test_pred['Pb Mass Rec']))
+    pearson_training_conc_pb.append(pearsonr(Y_training_f['Pb Mass Rec'], Y_training_pred['Pb Mass Rec']))
+    pearson_tailings.append(pearsonr(Y_test_f['Tailings Mass Rec'], Y_test_pred['Tailings Mass Rec']))
+    pearson_training_tailings.append(pearsonr(Y_training_f['Tailings Mass Rec'], Y_training_pred['Tailings Mass Rec']))
+        
+cont = 0
+r_training_rm_conc_zn = []
+r_training_rm_conc_pb = []
+r_training_rm_tailings = []
+r_rm_conc_zn = []
+r_rm_conc_pb = []
+r_rm_tailings = []
+r_training_conc_zn = []
+r_training_conc_pb = []
+r_training_tailings = []
+r_conc_zn = []
+r_conc_pb = []
+r_tailings = []
+
+while cont<(len(pearson_training_rm_conc_zn)):
+    r_training_rm_conc_zn.append(pearson_training_rm_conc_zn[cont][0])
+    r_rm_conc_zn.append(pearson_rm_conc_zn[cont][0])
+    r_training_rm_conc_pb.append(pearson_training_rm_conc_pb[cont][0])
+    r_rm_conc_pb.append(pearson_rm_conc_pb[cont][0])
+    r_training_rm_tailings.append(pearson_training_rm_tailings[cont][0])
+    r_rm_tailings.append(pearson_rm_tailings[cont][0])
+    r_training_conc_zn.append(pearson_training_conc_zn[cont][0])
+    r_conc_zn.append(pearson_conc_zn[cont][0])
+    r_training_conc_pb.append(pearson_training_conc_pb[cont][0])
+    r_conc_pb.append(pearson_conc_pb[cont][0])
+    r_training_tailings.append(pearson_training_tailings[cont][0])
+    r_tailings.append(pearson_tailings[cont][0])
+    cont = cont+1
+
+### RELATIVE ERROR RESULTS ###
+
+erro_rm_conc_zn = ((Y_training_pred['Zn Met Rec in Zn Conc']-Y_training_f['Zn Met Rec in Zn Conc'])/Y_training_f['Zn Met Rec in Zn Conc'])*100
+erro_rm_conc_pb = ((Y_training_pred['Zn Met Rec in Pb Conc']-Y_training_f['Zn Met Rec in Pb Conc'])/Y_training_f['Zn Met Rec in Pb Conc'])*100
+erro_rm_tailings = ((Y_training_pred['Zn Met Rec in Tailings']-Y_training_f['Zn Met Rec in Tailings'])/Y_training_f['Zn Met Rec in Tailings'])*100
+erro_conc_zn = ((Y_training_pred['Zn Mass Rec']-Y_training_f['Zn Mass Rec'])/Y_training_f['Zn Mass Rec'])*100
+erro_conc_pb = ((Y_training_pred['Pb Mass Rec']-Y_training_f['Pb Mass Rec'])/Y_training_f['Pb Mass Rec'])*100
+erro_tailings = ((Y_training_pred['Tailings Mass Rec']-Y_training_f['Tailings Mass Rec'])/Y_training_f['Tailings Mass Rec'])*100
+erro_rm_conc_zn_t = ((Y_test_pred['Zn Met Rec in Zn Conc']-Y_test_f['Zn Met Rec in Zn Conc'])/Y_test_f['Zn Met Rec in Zn Conc'])*100
+erro_rm_conc_pb_t = ((Y_test_pred['Zn Met Rec in Pb Conc']-Y_test_f['Zn Met Rec in Pb Conc'])/Y_test_f['Zn Met Rec in Pb Conc'])*100
+erro_rm_tailings_t = ((Y_test_pred['Zn Met Rec in Tailings']-Y_test_f['Zn Met Rec in Tailings'])/Y_test_f['Zn Met Rec in Tailings'])*100
+erro_conc_zn_t = ((Y_test_pred['Zn Mass Rec']-Y_test_f['Zn Mass Rec'])/Y_test_f['Zn Mass Rec'])*100
+erro_conc_pb_t = ((Y_test_pred['Pb Mass Rec']-Y_test_f['Pb Mass Rec'])/Y_test_f['Pb Mass Rec'])*100
+erro_tailings_t = ((Y_test_pred['Tailings Mass Rec']-Y_test_f['Tailings Mass Rec'])/Y_test_f['Tailings Mass Rec'])*100
+
+print ('Relative Error Results')                  
+print ('Training Set')   
+print ('Zn Conc. Mass Recovery '+str(erro_conc_zn.mean()))
+print ('Pb Conc. Mass Recovery '+str(erro_conc_pb.mean()))
+print ('Tailings Mass Recovery '+str(erro_tailings.mean()))
+print ('Zn Met. Recovery in Zn Conc '+str(erro_rm_conc_zn.mean()))
+print ('Zn Met. Recovery in Pb Conc '+str(erro_rm_conc_pb.mean()))
+print ('Zn Met. Recovery in Tailings '+str(erro_rm_tailings.mean()))
+print ('Test Set')
+print ('Zn Conc. Mass Recovery '+str(erro_conc_zn_t.mean()))
+print ('Pb Conc. Mass Recovery '+str(erro_conc_pb_t.mean()))
+print ('Tailings Mass Recovery '+str(erro_tailings_t.mean()))
+print ('Zn Met. Recovery in Zn Conc '+str(erro_rm_conc_zn_t.mean()))
+print ('Zn Met. Recovery in Pb Conc '+str(erro_rm_conc_pb_t.mean()))
+print ('Zn Met. Recovery in Tailings'+str(erro_rm_tailings_t.mean()))
+                  
+### PEARSON CORRELATION RESULTS ###    
+
+print ('')
+print ('Pearson Correlation Results')  
+print ('Training Set')
+print ('Zn Conc. Mass Recovery '+str(r_training_conc_zn))
+print ('Pb Conc. Mass Recovery '+str(r_training_conc_pb))
+print ('Tailings Mass Recovery '+str(r_training_tailings))
+print ('Zn Met. Recovery in Zn Conc '+str(r_training_rm_conc_zn))
+print ('Zn Met. Recovery in Pb Conc '+str(r_training_rm_conc_pb))
+print ('Zn Met. Recovery in Tailings '+str(r_training_rm_tailings))
+print ('Test Set')
+print ('Zn Conc. Mass Recovery '+str(r_conc_zn))
+print ('Pb Conc. Mass Recovery '+str(r_conc_pb))
+print ('Tailings Mass Recovery '+str(r_tailings))
+print ('Zn Met. Recovery in Zn Conc '+str(r_rm_conc_zn))
+print ('Zn Met. Recovery in Pb Conc '+str(r_rm_conc_pb))
+print ('Zn Met. Recovery in Tailings '+str(r_rm_tailings))
+
+### MAE RESULTS ### 
+
+print ('')
+print ('MAE Results') 
+print ('Training Set')
+print ('Zn Conc. Mass Recovery '+str(mae_training_conc_zn))
+print ('Pb Conc. Mass Recovery '+str(mae_training_conc_pb))
+print ('Tailings Mass Recovery '+str(mae_training_tailings))
+print ('Zn Met. Recovery in Zn Conc '+str(mae_training_rm_conc_zn))
+print ('Zn Met. Recovery in Pb Conc '+str(mae_training_rm_conc_pb))
+print ('Zn Met. Recovery in Tailings '+str(mae_training_rm_tailings))
+print ('Test Set')
+print ('Zn Conc. Mass Recovery '+str(mae_conc_zn))
+print ('Pb Conc. Mass Recovery '+str(mae_conc_pb))
+print ('Tailings Mass Recovery '+str(mae_tailings))
+print ('Zn Met. Recovery in Zn Conc '+str(mae_rm_conc_zn))
+print ('Zn Met. Recovery in Pb Conc '+str(mae_rm_conc_pb))
+print ('Zn Met. Recovery in Tailings '+str(mae_rm_tailings))
+
+### MSE RESULTS ### 
+
+print ('')
+print ('MSE Results')
+print ('Training Set')
+print ('Zn Conc. Mass Recovery '+str(mse_training_conc_zn))
+print ('Pb Conc. Mass Recovery '+str(mse_training_conc_pb))
+print ('Tailings Mass Recovery '+str(mse_training_tailings))
+print ('Zn Met. Recovery in Zn Conc '+str(mse_training_rm_conc_zn))
+print ('Zn Met. Recovery in Pb Conc '+str(mse_training_rm_conc_pb))
+print ('Zn Met. Recovery in Tailings '+str(mse_training_rm_tailings))
+print ('Test Set')
+print ('Zn Conc. Mass Recovery '+str(mse_conc_zn))
+print ('Pb Conc. Mass Recovery '+str(mse_conc_pb))
+print ('Tailings Mass Recovery '+str(mse_tailings))
+print ('Zn Met. Recovery in Zn Conc '+str(mse_rm_conc_zn))
+print ('Zn Met. Recovery in Pb Conc '+str(mse_rm_conc_pb))
+print ('Zn Met. Recovery in Tailings '+str(mse_rm_tailings))
+
