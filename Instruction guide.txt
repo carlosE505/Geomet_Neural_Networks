@@ -7,8 +7,8 @@
 7) Insert the number of output nodes in the 100th line after 'output_dim = ' and the activation function related to the output layer after 'activation ='.
 8) Run the code from line 10 until line 171.
 9) Evaluate the results running the code from line 173 until line 259.
-10) After finish the all neural network computation for the first k-fold set, change the training file name in line 32 and the test file name in the 34th line for the names related to the second k-fold set.
+10) After finishing the all neural network computation for the first k-fold set, change the training file name in line 32 and the test file name in the 34th line for the names related to the second k-fold set.
 Run the code using this new database. Do this step until all k-fold files were analyzed.
 
 Note: the training and test set in this repository are not the original files used in this study, once the authors do not have permission to share data.
-Because of that, fictional data were created to provide to the readers an example of neural network build using the code herein presented.
+Due to that, fictional data were created to provide to the readers an example of neural network build using the code herein presented.
